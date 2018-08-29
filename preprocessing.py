@@ -5,9 +5,6 @@ from shutil import copyfile
 import subprocess
 
 from sklearn.model_selection import train_test_split
-import scipy.io.wavfile as wav
-import pandas as pd
-import numpy as np
 
 
 
@@ -34,12 +31,6 @@ def distribute_emotion():
             copyfile(join(source_dir, audio), join(target_dir, audio))
         except KeyError:
             pass
-
-def readAudio():
-    source_dir = "standized_chunks"
-    for audio in listdir(source_dir):
-        freq, signal = wav.read(join(source_dir, audio))
-        print(signal.shape) # 24576
 
 def distributeTrainTest():
     dir_names = ["train", "test"]
