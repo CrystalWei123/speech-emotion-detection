@@ -14,8 +14,8 @@ import numpy as np
 def preprocess():
     # distribute_emotion()
     # distributeTrainTest()
-    source2Chunks()
-    # normalizedAudio()
+    # source2Chunks()
+    normalizedAudio()
 
 def distribute_emotion():
     emotions = ["anger", "boredom", "disgust", "fear", "happiness", "sadness", "neural"]
@@ -90,16 +90,16 @@ def normalizedAudio():
         - https://trac.ffmpeg.org/wiki/AudioVolume
     """
     source_dir = "chunks"
-    target_dir = "standized_chunks"
+    target_dir = "sd_chunks"
 
-    if not isdir(target_dir):
-        os.mkdir(target_dir)
-    
-    for audio_name in listdir(source_dir):
-        audio_prefix = audio_name.split(".")[0]
-        command = "ffmpeg -i {} -filter:a loudnorm {}".format(
-            join(source_dir, audio_name), join(target_dir, "{}.wav".format(audio_prefix)))
-        subprocess.run(command, shell=True)
+    for attr in ["test", "train"]:
+        if not isdir(join(target_dir, attr)):
+            os.mkdir(join(target_dir, attr))
+        for audio_name in listdir(join(source_dir, attr)):
+            command = "ffmpeg -i {} -filter:a loudnorm {}".format(
+                join(source_dir, attr, audio_name),
+                join(target_dir, attr, audio_name))
+            subprocess.run(command, shell=True)
     
 def source2Chunks():
     """ Split audio to 20ms-length chunks
