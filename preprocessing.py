@@ -12,7 +12,8 @@ import numpy as np
 
 
 def preprocess():
-    distribute_emotion()
+    # distribute_emotion()
+    distributeTrainTest()
     # source2Chunks()
     # normalizedAudio()
 
@@ -39,6 +40,40 @@ def readAudio():
     for audio in listdir(source_dir):
         freq, signal = wav.read(join(source_dir, audio))
         print(signal.shape) # 24576
+
+def distributeTrainTest():
+    dir_names = ["train", "test"]
+    for dir_name in dir_names:
+        if not isdir(dir_name):
+            os.mkdir(dir_name)
+    
+    emotions = ["anger", "boredom", "disgust", "fear", "happiness", "sadness", "neural"]
+    train_x_list = []
+    train_y_list = []
+
+    test_x_list = []
+    test_y_list = []
+
+
+    for emotion in emotions:
+        audios = listdir(emotion)
+        # print(len(audios))
+        x_train, x_test, y_train, y_test = train_test_split(audios, 
+                [emotion for _ in range(len(audios))], test_size=0.2)
+        # print(len(x_train), x_train)
+        # print(len(x_test), x_test)
+        for attr, dir_n, x_list, y_list in zip([x_train, x_test], dir_names,
+                    [train_x_list, test_x_list], [train_y_list, test_y_list]):
+            for audio in attr:
+                copyfile(join(emotion, audio), join(dir_n, audio))
+                x_list.append(audio.split(".")[0]) 
+                y_list.append(emotion)
+            # print(dict_name)
+        
+    train_df = pd.DataFrame({"x": train_x_list, "y": train_y_list})
+    test_df = pd.DataFrame({"x": test_x_list, "y": test_y_list})
+    train_df.to_csv("train.csv", index=False)
+    test_df.to_csv("test.csv", index=False)
 
 def removeSilence():
     """ Remove the silent part of audio
